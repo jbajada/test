@@ -6,66 +6,56 @@ do
     case $i in
         -l=*|--location=*)
             envLocation="${i#*=}"
-            shift # past argument
         ;;
 
         -b=*|--brand=*)
             envBrand="${i#*=}"
-            shift # past argument
         ;;
 
         -e=*|--environmenttype=*)
             envEnvironmentType="${i#*=}"
-            shift # past argument
         ;;
 
         -i=*|--instance=*)
             envInstance="${i#*=}"
-            shift # past argument
         ;;
 
         -s=*|--servertype=*)
             envServerType="${i#*=}"
-            shift # past argument
         ;;
 
         -c=*|--instancecount=*)
             envInstanceCount="${i#*=}"
-            shift # past argument
         ;;
     
         -o=*|--owner=*)
             envOwner="${i#*=}"
-            shift # past argument
         ;;
 
         -n=*|--servername=*)
             envServerName="${i#*=}"
-            shift # past argument
         ;;
 
         -d=*|--description=*)
             envDescription="${i#*=}"
-            shift # past argument
         ;;
         
         -u=*|--gitusername=*)
             envGitUsername="${i#*=}"
-            shift # past argument
         ;;
         
         -p=*|--gitpassword=*)
             envGitPassword="${i#*=}"
-            shift # past argument
         ;;
 
         *)
             # unknown option
         ;;
     esac
-
-    shift # past argument or value
 done
+
+echo ${envLocation}
+echo ${envBrand}
 
 ## Disable all Repos
 sed -i 's/enabled=1/enabled=0/g' /etc/yum.repos.d/*.repo
@@ -90,8 +80,8 @@ EOF
 yum install -y puppet-3.4.3
 
 ## Install Puppet Certificates
-#export ssldir=$(puppet agent --genconfig | grep -e 'ssldir =' | sed -e 's/^[ \t]*//' | awk '{print $3}')
-#puppet cert list --all
+export ssldir=$(puppet agent --genconfig | grep -e 'ssldir =' | sed -e 's/^[ \t]*//' | awk '{print $3}')
+puppet cert list --all
 
 ## Permanent Certificate Solution
 ##curl -u ${envGitUsername}:${envGitPassword} https://stash.harveynorman.com.au/projects/PUPPET/repos/securitykeys/browse/puppet/certs/ca.pem?raw -o $ssldir/certs/ca.pem
