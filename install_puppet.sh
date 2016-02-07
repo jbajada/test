@@ -98,7 +98,6 @@ curl https://raw.githubusercontent.com/jbajada/test/master/ssl/certs/${envEnviro
 curl https://raw.githubusercontent.com/jbajada/test/master/ssl/public_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
 curl https://raw.githubusercontent.com/jbajada/test/master/ssl/private_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
 
-
 find $ssldir/ -name '*.pem' | xargs chmod 600
 find $ssldir/ -name '*.pem' | xargs chown puppet:puppet
 
@@ -142,19 +141,19 @@ EOF
 grep -q -F 'puppet agent --test --waitforcert 60' /etc/rc.local || echo 'puppet agent --test --waitforcert 60' >> /etc/rc.local
 
 
-## Configure Server Variables
-#mkdir -p /etc/facter/facts.d
-#cat > /etc/facter/facts.d/server.txt <<EOF
-#server_name=${envServerName}
-#server_description=${envDescription}
-#server_brand=${envBrand}
-#server_type=${envEnvironmentType}
-#server_region=${envLocation}
-#server_role=${envServerType}
-#server_owner=${envOwner}
-#server_public=false
-#EOF
+# Configure Server Variables
+mkdir -p /etc/facter/facts.d
+cat > /etc/facter/facts.d/server.txt <<EOF
+server_name=${envServerName}
+server_description=${envDescription}
+server_brand=${envBrand}
+server_type=${envEnvironmentType}
+server_region=${envLocation}
+server_role=${envServerType}
+server_owner=${envOwner}
+server_public=false
+EOF
 
-## Setup Puppet cron and Run Puppet","\n",
-#puppet resource cron puppet-agent ensure=present user=root minute=*/15 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
-#puppet agent --test --waitforcert 60
+# Setup Puppet cron and Run Puppet","\n",
+puppet resource cron puppet-agent ensure=present user=root minute=*/15 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
+puppet agent --test --waitforcert 60
