@@ -82,6 +82,9 @@ yum install -y puppet-3.4.3
 ## Install Puppet Certificates
 export ssldir=$(puppet agent --genconfig | grep -e 'ssldir =' | sed -e 's/^[ \t]*//' | awk '{print $3}')
 puppet cert list --all
+mkdir -p $ssldir/certs/
+mkdir -p $ssldir/public_keys/
+mkdir -p $ssldir/private_keys/
 
 ## Permanent Certificate Solution
 ##curl -u ${envGitUsername}:${envGitPassword} https://stash.harveynorman.com.au/projects/PUPPET/repos/securitykeys/browse/puppet/certs/ca.pem?raw -o $ssldir/certs/ca.pem
@@ -90,23 +93,53 @@ puppet cert list --all
 ##curl -u ${envGitUsername}:${envGitPassword} https://stash.harveynorman.com.au/projects/PUPPET/repos/securitykeys/browse/puppet/private_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
 
 ## Temporary Certificate Solution
-#curl https://raw.githubusercontent.com/jbajada/test/master/puppet/certs/ca.pem -o $ssldir/certs/ca.pem
-#curl https://raw.githubusercontent.com/jbajada/test/master/puppet/ca/signed/${envEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
-#curl https://raw.githubusercontent.com/jbajada/test/master/puppet/public_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
-#curl https://raw.githubusercontent.com/jbajada/test/master/puppet/private_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
+curl https://raw.githubusercontent.com/jbajada/test/master/ssl/certs/ca.pem -o $ssldir/certs/ca.pem
+curl https://raw.githubusercontent.com/jbajada/test/master/ssl/ca/signed/${envEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
+curl https://raw.githubusercontent.com/jbajada/test/master/ssl/public_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
+curl https://raw.githubusercontent.com/jbajada/test/master/ssl/private_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
 
-#find $ssldir/ -name '*.pem' | xargs chmod 600
-#find $ssldir/ -name '*.pem' | xargs chown puppet:puppet
+find $ssldir/ -name '*.pem' | xargs chmod 600
+find $ssldir/ -name '*.pem' | xargs chown puppet:puppet
 
 ## Configure Puppet
-#echo "pluginsync=true" >> /etc/puppet/puppet.conf
-#echo "server=puppet" >> /etc/puppet/puppet.conf
-#echo "" >> /etc/puppet/puppet.conf
-#echo "# use a generic certificate when negotiating with the puppet master" >> /etc/puppet/puppet.conf,
-#echo "certname = ${envEnvironmentType}.hndigital.net" >> /etc/puppet/puppet.conf
-#echo "node_name = facter" >> /etc/puppet/puppet.conf
-#echo "node_name_fact = fqdn" >> /etc/puppet/puppet.conf
-#echo "puppet agent --test --waitforcert 60" >> /etc/rc.local
+cat > /etc/puppet/puppet.conf <<EOF
+[main]
+    # The Puppet log directory.
+    # The default value is '/log'.
+    logdir = /var/log/puppet
+
+    # Where Puppet PID files are kept.
+    # The default value is '/run'.
+    rundir = /var/run/puppet
+
+    # Where SSL certificates are kept.
+    # The default value is '\$confdir/ssl'.
+    ssldir = \$vardir/ssl
+
+[agent]
+    # The file in which puppetd stores a list of the classes
+    # associated with the retrieved configuratiion.  Can be loaded in
+    # the separate puppet executable using the --loadclasses
+    # option.
+    # The default value is '\$confdir/classes.txt'.
+    classfile = \$vardir/classes.txt
+
+    # Where puppetd caches the local configuration.  An
+    # extension indicating the cache format is added automatically.
+    # The default value is '$confdir/localconfig'.
+    localconfig = \$vardir/localconfig
+    pluginsync = true
+    server = puppetmaster-azure.dev.hndigital.net
+    
+    # use a generic certificate when negotiating with the puppet master
+    certname = ${envEnvironmentType}.hndigital.net
+    node_name = facter
+    node_name_fact = fqdn
+EOF
+
+# Add puppet call to server startup
+grep -q -F 'puppet agent --test --waitforcert 60' /etc/rc.local || echo 'puppet agent --test --waitforcert 60' >> /etc/rc.local
+
 
 ## Configure Server Variables
 #mkdir -p /etc/facter/facts.d
