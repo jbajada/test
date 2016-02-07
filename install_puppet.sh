@@ -94,9 +94,10 @@ mkdir -p $ssldir/private_keys/
 
 ## Temporary Certificate Solution
 curl https://raw.githubusercontent.com/jbajada/test/master/ssl/certs/ca.pem -o $ssldir/certs/ca.pem
-curl https://raw.githubusercontent.com/jbajada/test/master/ssl/ca/signed/${envEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
-curl https://raw.githubusercontent.com/jbajada/test/master/ssl/public_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
-curl https://raw.githubusercontent.com/jbajada/test/master/ssl/private_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
+curl https://raw.githubusercontent.com/jbajada/test/master/ssl/certs/${envEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
+curl https://raw.githubusercontent.com/jbajada/test/master/ssl/public_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
+curl https://raw.githubusercontent.com/jbajada/test/master/ssl/private_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
+
 
 find $ssldir/ -name '*.pem' | xargs chmod 600
 find $ssldir/ -name '*.pem' | xargs chown puppet:puppet
