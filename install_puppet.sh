@@ -7,6 +7,10 @@ do
         -l=*|--environmentlocation=*)
             vEnvironmentLocation="${i#*=}"
         ;;
+        
+        -e=*|--environmentname=*)
+            vEnvironmentName="${i#*=}"
+        ;;
 
         -b=*|--environmentbrand=*)
             vEnvironmentBrand="${i#*=}"
@@ -16,7 +20,7 @@ do
             vEnvironmentDescription="${i#*=}"
         ;;
 
-        -e=*|--environmenttype=*)
+        -t=*|--environmenttype=*)
             vEnvironmentType="${i#*=}"
         ;;
 
