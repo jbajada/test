@@ -106,8 +106,8 @@ mkdir -p $ssldir/private_keys/
 
 ## Temporary Certificate Solution
 curl ${envGitRepository}/ssl/certs/ca.pem -o $ssldir/certs/ca.pem
-curl ${envGitRepository}/test/master/ssl/certs/${envEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
-curl ${envGitRepository}/test/master/ssl/public_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
+curl ${envGitRepository}/ssl/certs/${envEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
+curl ${envGitRepository}/ssl/public_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
 curl ${envGitRepository}/ssl/private_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
 
 find $ssldir/ -name '*.pem' | xargs chmod 600
