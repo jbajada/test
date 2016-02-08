@@ -96,16 +96,16 @@ mkdir -p $ssldir/public_keys/
 mkdir -p $ssldir/private_keys/
 
 ## Permanent Certificate Solution
-##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/certs/ca.pem?raw -o $ssldir/certs/ca.pem
-##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/ca/signed/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/certs/${vEnvironmentType}.hndigital.net.pem
-##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/public_keys/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${vEnvironmentType}.hndigital.net.pem
-##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/private_keys/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${vEnvironmentType}.hndigital.net.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${vGitRepository}/securitykeys/browse/puppet/certs/ca.pem?raw -o $ssldir/certs/ca.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${vGitRepository}/securitykeys/browse/puppet/ca/signed/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/certs/${vEnvironmentType}.hndigital.net.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${vGitRepository}/securitykeys/browse/puppet/public_keys/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${vEnvironmentType}.hndigital.net.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${vGitRepository}/securitykeys/browse/puppet/private_keys/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${vEnvironmentType}.hndigital.net.pem
 
 ## Temporary Certificate Solution
-curl ${envGitRepository}/ssl/certs/ca.pem -o $ssldir/certs/ca.pem
-curl ${envGitRepository}/ssl/certs/${vEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${vEnvironmentType}.hndigital.net.pem
-curl ${envGitRepository}/ssl/public_keys/${vEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${vEnvironmentType}.hndigital.net.pem
-curl ${envGitRepository}/ssl/private_keys/${vEnvironmentType}.hndigital.net.pem -o $ssldir/private_keys/${vEnvironmentType}.hndigital.net.pem
+curl ${vGitRepository}/ssl/certs/ca.pem -o $ssldir/certs/ca.pem
+curl ${vGitRepository}/ssl/certs/${vEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${vEnvironmentType}.hndigital.net.pem
+curl ${vGitRepository}/ssl/public_keys/${vEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${vEnvironmentType}.hndigital.net.pem
+curl ${vGitRepository}/ssl/private_keys/${vEnvironmentType}.hndigital.net.pem -o $ssldir/private_keys/${vEnvironmentType}.hndigital.net.pem
 
 find $ssldir/ -name '*.pem' | xargs chmod 600
 find $ssldir/ -name '*.pem' | xargs chown puppet:puppet
