@@ -66,9 +66,6 @@ do
     esac
 done
 
-echo ${envLocation}
-echo ${envBrand}
-
 ## Disable all Repos
 sed -i 's/enabled=1/enabled=0/g' /etc/yum.repos.d/*.repo
 sed -i 's/^releasever=latest/#releasever=latest/g' /etc/yum.conf
@@ -100,15 +97,15 @@ mkdir -p $ssldir/private_keys/
 
 ## Permanent Certificate Solution
 ##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/certs/ca.pem?raw -o $ssldir/certs/ca.pem
-##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/ca/signed/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
-##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/public_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
-##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/private_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/ca/signed/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/certs/${vEnvironmentType}.hndigital.net.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/public_keys/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${vEnvironmentType}.hndigital.net.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/private_keys/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${vEnvironmentType}.hndigital.net.pem
 
 ## Temporary Certificate Solution
 curl ${envGitRepository}/ssl/certs/ca.pem -o $ssldir/certs/ca.pem
-curl ${envGitRepository}/ssl/certs/${envEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
-curl ${envGitRepository}/ssl/public_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
-curl ${envGitRepository}/ssl/private_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
+curl ${envGitRepository}/ssl/certs/${vEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${vEnvironmentType}.hndigital.net.pem
+curl ${envGitRepository}/ssl/public_keys/${vEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${vEnvironmentType}.hndigital.net.pem
+curl ${envGitRepository}/ssl/private_keys/${vEnvironmentType}.hndigital.net.pem -o $ssldir/private_keys/${vEnvironmentType}.hndigital.net.pem
 
 find $ssldir/ -name '*.pem' | xargs chmod 600
 find $ssldir/ -name '*.pem' | xargs chown puppet:puppet
@@ -141,10 +138,10 @@ cat > /etc/puppet/puppet.conf <<EOF
     # The default value is '$confdir/localconfig'.
     localconfig = \$vardir/localconfig
     pluginsync = true
-    server = ${puppetserver}
+    server = ${vPuppetServer}
     
     # use a generic certificate when negotiating with the puppet master
-    certname = ${envEnvironmentType}.hndigital.net
+    certname = ${vEnvironmentType}.hndigital.net
     node_name = facter
     node_name_fact = fqdn
 EOF
