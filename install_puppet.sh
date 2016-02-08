@@ -4,48 +4,56 @@
 for i in "$@"
 do
     case $i in
-        -l=*|--location=*)
-            envLocation="${i#*=}"
+        -l=*|--environmentlocation=*)
+            vEnvironmentLocation="${i#*=}"
         ;;
 
-        -b=*|--brand=*)
-            envBrand="${i#*=}"
+        -b=*|--environmentbrand=*)
+            vEnvironmentBrand="${i#*=}"
+        ;;
+
+        -d=*|--environmentdescription=*)
+            vEnvironmentDescription="${i#*=}"
         ;;
 
         -e=*|--environmenttype=*)
-            envEnvironmentType="${i#*=}"
+            vEnvironmentType="${i#*=}"
         ;;
 
-        -i=*|--instance=*)
-            envInstance="${i#*=}"
+        -i=*|--environmentinstance=*)
+            vEnvironmentInstance="${i#*=}"
         ;;
 
-        -s=*|--servertype=*)
-            envServerType="${i#*=}"
-        ;;
-
-        -c=*|--instancecount=*)
-            envInstanceCount="${i#*=}"
-        ;;
-    
-        -o=*|--owner=*)
-            envOwner="${i#*=}"
+        -o=*|--environmentowner=*)
+            vEnvironmentOwner="${i#*=}"
         ;;
 
         -n=*|--servername=*)
-            envServerName="${i#*=}"
+            vServerName="${i#*=}"
         ;;
 
-        -d=*|--description=*)
-            envDescription="${i#*=}"
+        -s=*|--servertype=*)
+            vServerType="${i#*=}"
         ;;
-        
+
+        -c=*|--serverinstance=*)
+            vServerInstance="${i#*=}"
+        ;;
+
+        -r=*|--gitrepository=*)
+            vGitRepository="${i#*=}"
+        ;;
+
         -u=*|--gitusername=*)
-            envGitUsername="${i#*=}"
+            vGitUsername="${i#*=}"
         ;;
-        
+
         -p=*|--gitpassword=*)
-            envGitPassword="${i#*=}"
+            vGitPassword="${i#*=}"
+        ;;
+
+        -m=*|--puppetserver=*)
+            vPuppetServer="${i#*=}"
         ;;
 
         *)
@@ -87,16 +95,16 @@ mkdir -p $ssldir/public_keys/
 mkdir -p $ssldir/private_keys/
 
 ## Permanent Certificate Solution
-##curl -u ${envGitUsername}:${envGitPassword} https://stash.harveynorman.com.au/projects/PUPPET/repos/securitykeys/browse/puppet/certs/ca.pem?raw -o $ssldir/certs/ca.pem
-##curl -u ${envGitUsername}:${envGitPassword} https://stash.harveynorman.com.au/projects/PUPPET/repos/securitykeys/browse/puppet/ca/signed/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
-##curl -u ${envGitUsername}:${envGitPassword} https://stash.harveynorman.com.au/projects/PUPPET/repos/securitykeys/browse/puppet/public_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
-##curl -u ${envGitUsername}:${envGitPassword} https://stash.harveynorman.com.au/projects/PUPPET/repos/securitykeys/browse/puppet/private_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/certs/ca.pem?raw -o $ssldir/certs/ca.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/ca/signed/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/public_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
+##curl -u ${envGitUsername}:${envGitPassword} ${envGitRepository}/securitykeys/browse/puppet/private_keys/${envEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
 
 ## Temporary Certificate Solution
-curl https://raw.githubusercontent.com/jbajada/test/master/ssl/certs/ca.pem -o $ssldir/certs/ca.pem
-curl https://raw.githubusercontent.com/jbajada/test/master/ssl/certs/${envEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
-curl https://raw.githubusercontent.com/jbajada/test/master/ssl/public_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
-curl https://raw.githubusercontent.com/jbajada/test/master/ssl/private_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
+curl ${envGitRepository}/ssl/certs/ca.pem -o $ssldir/certs/ca.pem
+curl ${envGitRepository}/test/master/ssl/certs/${envEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${envEnvironmentType}.hndigital.net.pem
+curl ${envGitRepository}/test/master/ssl/public_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${envEnvironmentType}.hndigital.net.pem
+curl ${envGitRepository}/ssl/private_keys/${envEnvironmentType}.hndigital.net.pem -o $ssldir/private_keys/${envEnvironmentType}.hndigital.net.pem
 
 find $ssldir/ -name '*.pem' | xargs chmod 600
 find $ssldir/ -name '*.pem' | xargs chown puppet:puppet
@@ -129,7 +137,7 @@ cat > /etc/puppet/puppet.conf <<EOF
     # The default value is '$confdir/localconfig'.
     localconfig = \$vardir/localconfig
     pluginsync = true
-    server = puppetmaster-azure.dev.hndigital.net
+    server = ${puppetserver}
     
     # use a generic certificate when negotiating with the puppet master
     certname = ${envEnvironmentType}.hndigital.net
@@ -138,20 +146,27 @@ cat > /etc/puppet/puppet.conf <<EOF
 EOF
 
 # Add puppet call to server startup
-grep -q -F 'puppet agent --test --waitforcert 60' /etc/rc.local || echo 'puppet agent --test --waitforcert 60' >> /etc/rc.local
+grep -q -F 'puppet agent --test' /etc/rc.local || echo 'puppet agent --test' >> /etc/rc.local
 
-
-# Configure Server Variables
+# Create Factor Facts folder
 mkdir -p /etc/facter/facts.d
+
+# Configure Environment Facts
+cat > /etc/facter/facts.d/environment.txt <<EOF
+env_location=${vEnvironmentLocation}
+env_name=${vEnvironmentName}
+env_description=${vEnvironmentDescription}
+env_brand=${vEnvironmentBrand}
+env_type=${vEnvironmentType}
+env_instance=${vEnvironmentInstance}
+env_owner=${vEnvironmentOwner}
+EOF
+
+# Configure Server Facts
 cat > /etc/facter/facts.d/server.txt <<EOF
-server_name=${envServerName}
-server_description=${envDescription}
-server_brand=${envBrand}
-server_type=${envEnvironmentType}
-server_region=${envLocation}
-server_role=${envServerType}
-server_owner=${envOwner}
-server_public=false
+srv_name=${vServerName}
+srv_type=${vServerType}
+srv_instance=${vServerInstance}
 EOF
 
 # Setup Puppet cron and Run Puppet","\n",
