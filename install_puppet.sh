@@ -4,6 +4,10 @@
 for i in "$@"
 do
     case $i in
+        -w=*|--environmentplatform=*)
+            vEnvironmentPlatform="${i#*=}"
+        ;;
+
         -l=*|--environmentlocation=*)
             vEnvironmentLocation="${i#*=}"
         ;;
@@ -154,6 +158,7 @@ mkdir -p /etc/facter/facts.d
 
 # Configure Environment Facts
 cat > /etc/facter/facts.d/environment.txt <<EOF
+env_platform=${vEnvironmentPlatform}
 env_location=${vEnvironmentLocation}
 env_name=${vEnvironmentName}
 env_description=${vEnvironmentDescription}
