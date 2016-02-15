@@ -176,5 +176,5 @@ srv_instance=${vServerInstance}
 EOF
 
 # Setup Puppet cron and Run Puppet","\n",
-#### puppet resource cron puppet-agent ensure=present user=root minute=*/15 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
-#### puppet agent --test --waitforcert 60
+puppet resource cron puppet-agent ensure=present user=root minute=*/15 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
+puppet agent --test
