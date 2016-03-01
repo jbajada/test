@@ -63,7 +63,15 @@ do
         -m=*|--puppetserver=*)
             vPuppetServer="${i#*=}"
         ;;
-
+        
+        -g=*|--resourcegroup=*)
+            vResourceGroup="${i#*=}"
+        ;;
+        
+        -a=*|--storageaccountname=*)
+            vStorageAccountName="${i#*=}"
+        ;;
+        
         *)
             # unknown option
         ;;
@@ -166,6 +174,8 @@ env_brand=${vEnvironmentBrand}
 env_type=${vEnvironmentType}
 env_instance=${vEnvironmentInstance}
 env_owner=${vEnvironmentOwner}
+env_resourcegroup=${vResourceGroup}
+env_storageaccountname=${vStorageAccountName}
 EOF
 
 # Configure Server Facts
