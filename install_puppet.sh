@@ -78,6 +78,10 @@ do
     esac
 done
 
+## Delete all existing Repos
+rm -f /etc/yum.repos.d/*.repo
+yum clean all
+
 ## Disable all Repos
 sed -i 's/enabled=1/enabled=0/g' /etc/yum.repos.d/*.repo
 sed -i 's/^releasever=latest/#releasever=latest/g' /etc/yum.conf
