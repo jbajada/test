@@ -82,10 +82,6 @@ done
 rm -f /etc/yum.repos.d/*.repo
 yum clean all
 
-## Disable all Repos
-sed -i 's/enabled=1/enabled=0/g' /etc/yum.repos.d/*.repo
-sed -i 's/^releasever=latest/#releasever=latest/g' /etc/yum.conf
-
 ## Add PuppetLabs Products repo
 cat > /etc/yum.repos.d/puppetlabs.repo <<EOF
 [puppetlabs-products]
@@ -97,6 +93,15 @@ gpgcheck=0
 [puppetlabs-deps]
 name=Puppet Labs Dependencies
 baseurl=http://puppetlabs-deps.repo.dev.hndigital.net
+enabled=1
+gpgcheck=0
+EOF
+
+## Add Centos 6 repo
+cat > /etc/yum.repos.d/centos6.repo <<EOF
+[centos6]
+name=Harvey Norman centos6 Repository
+baseurl=http://centos6.repo.dev.hndigital.net
 enabled=1
 gpgcheck=0
 EOF
