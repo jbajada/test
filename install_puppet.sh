@@ -78,8 +78,8 @@ do
     esac
 done
 
-## Delete all existing Repos
-rm -f /etc/yum.repos.d/*.repo
+## Disable all existing Repos
+mv /etc/yum.repos.d/*.repo /etc/yum.repos.d/*.repo.disabled
 yum clean all
 
 ## Add PuppetLabs Products repo
