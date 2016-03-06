@@ -79,7 +79,7 @@ do
 done
 
 ## Disable all existing Repos
-mv /etc/yum.repos.d/*.repo /etc/yum.repos.d/*.repo.disabled
+for f in *.repo; do mv "$f" "$f.disabled"; done
 yum clean all
 
 ## Add PuppetLabs Products repo
