@@ -78,38 +78,79 @@ do
     esac
 done
 
+## Get Server Machine Details
+OS=$(uname)
+KERNEL=$(uname -r)
+MACH=$(uname -m)
+
+## Get OS Details
+case $OS in
+  'Linux')
+      if [ -f /etc/redhat-release ]; then
+        DistroBasedOn='redhat'
+        DIST=$(cat /etc/redhat-release |sed s/\ release.*//)
+        PSUEDONAME=$(cat /etc/redhat-release | sed s/.*\(// | sed s/\)//)
+        REV=$(cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//)
+        MajorRev=$(cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*// | sed 's/[.].*//')
+      if [ -f /etc/centos-release ]; then
+        DistroBasedOn='centos'
+        DIST=$(cat /etc/centos-release |sed s/\ release.*//)
+        PSUEDONAME=$(cat /etc/centos-release | sed s/.*\(// | sed s/\)//)
+        REV=$(cat /etc/centos-release | sed s/.*release\ // | sed s/\ .*//)
+        MajorRev=$(cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*// | sed 's/[.].*//')
+      fi
+      if [ -f /etc/UnitedLinux-release ] ; then
+        ECHO 'OS Not Supported'
+        exit 1
+      fi
+    ;;
+  *)
+    ECHO 'OS Not Supported'
+    exit 1 
+    ;;
+esac
+
 ## Disable all existing Repos
 for f in /etc/yum.repos.d/*.repo; do mv "$f" "$f.disabled"; done
 yum clean all
 
 ## Add PuppetLabs Products repo
-cat > /etc/yum.repos.d/puppetlabs.repo <<EOF
-[puppetlabs-products]
+cat > /etc/yum.repos.d/hndg-puppetlabs.repo <<EOF
+[hndg-puppetlabs-products]
 name=Puppet Labs Products
-baseurl=http://puppetlabs-products.repo.dev.hndigital.net
+baseurl=http://puppetlabs-products.${DistroBasedOn}${MajorRev}.repo.dev.hndigital.net
 enabled=1
 gpgcheck=0
 
-[puppetlabs-deps]
+[hndg-puppetlabs-deps]
 name=Puppet Labs Dependencies
-baseurl=http://puppetlabs-deps.repo.dev.hndigital.net
+baseurl=http://puppetlabs-deps.${DistroBasedOn}${MajorRev}.repo.dev.hndigital.net
 enabled=1
 gpgcheck=0
 EOF
 
-## Add Centos 6 repo
-cat > /etc/yum.repos.d/centos6.repo <<EOF
-[centos6]
-name=Harvey Norman centos6 Repository
-baseurl=http://centos6.repo.dev.hndigital.net
+## Add OS repo
+cat > /etc/yum.repos.d/hndg-${DistroBasedOn}-base.repo <<EOF
+[hndg-${DistroBasedOn}-base]
+name=${DistroBasedOn} Repository
+baseurl=http://${DistroBasedOn}-base.${DistroBasedOn}${MajorRev}.repo.dev.hndigital.net
 enabled=1
 gpgcheck=0
 EOF
 
 ## Install Puppet
-yum install -y puppet-3.4.3
+yum install -y puppet
 
-## Install Puppet Certificates
+## Get unique ID of current server
+if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]; then
+  ## Running under AWS
+  vInstance_id=$(wget -q -O - http://instance-data/latest/meta-data/instance-id)
+else
+  ## Running under Azure  
+  vInstance_id=$(dmidecode | grep UUID | awk '{ print $2}')
+fi
+
+## Configure puppet to use the correct certificates
 export ssldir=$(puppet agent --genconfig | grep -e 'ssldir =' | sed -e 's/^[ \t]*//' | awk '{print $3}')
 puppet cert list --all
 mkdir -p $ssldir/certs/
@@ -131,44 +172,13 @@ curl ${vGitRepository}/ssl/private_keys/${vEnvironmentType}.hndigital.net.pem -o
 find $ssldir/ -name '*.pem' | xargs chmod 600
 find $ssldir/ -name '*.pem' | xargs chown puppet:puppet
 
-## Configure Puppet
-cat > /etc/puppet/puppet.conf <<EOF
-[main]
-    # The Puppet log directory.
-    # The default value is '/log'.
-    logdir = /var/log/puppet
-
-    # Where Puppet PID files are kept.
-    # The default value is '/run'.
-    rundir = /var/run/puppet
-
-    # Where SSL certificates are kept.
-    # The default value is '\$confdir/ssl'.
-    ssldir = \$vardir/ssl
-
-[agent]
-    # The file in which puppetd stores a list of the classes
-    # associated with the retrieved configuratiion.  Can be loaded in
-    # the separate puppet executable using the --loadclasses
-    # option.
-    # The default value is '\$confdir/classes.txt'.
-    classfile = \$vardir/classes.txt
-
-    # Where puppetd caches the local configuration.  An
-    # extension indicating the cache format is added automatically.
-    # The default value is '$confdir/localconfig'.
-    localconfig = \$vardir/localconfig
-    pluginsync = true
-    server = ${vPuppetServer}
-    
-    # use a generic certificate when negotiating with the puppet master
-    certname = ${vEnvironmentType}.hndigital.net
-    node_name = facter
-    node_name_fact = fqdn
-EOF
-
-# Add puppet call to server startup
-grep -q -F 'puppet agent --test' /etc/rc.local || echo 'puppet agent --test' >> /etc/rc.local
+## Configure puppet
+puppet config set --section agent pluginsync true
+puppet config set --section agent server ${vPuppetServer}
+puppet config set --section agent certname ${vEnvironmentType}.hndigital.net
+#puppet config set --section agent certname ${vInstance_id}
+puppet config set --section agent node_name facter
+puppet config set --section agent node_name_fact fqdn
 
 # Create Factor Facts folder
 mkdir -p /etc/facter/facts.d
@@ -196,4 +206,5 @@ EOF
 
 # Setup Puppet cron and Run Puppet","\n",
 #### puppet resource cron puppet-agent ensure=present user=root minute=*/15 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
+#### grep -q -F 'puppet agent --test' /etc/rc.local || echo 'puppet agent --test' >> /etc/rc.local
 #### puppet agent --test
