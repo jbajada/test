@@ -4,72 +4,80 @@
 for i in "$@"
 do
     case $i in
-        -w=*|--environmentplatform=*)
+        --environmentplatform=*)
             vEnvironmentPlatform="${i#*=}"
         ;;
 
-        -l=*|--environmentlocation=*)
+        --environmentlocation=*)
             vEnvironmentLocation="${i#*=}"
         ;;
         
-        -e=*|--environmentname=*)
+        --environmentname=*)
             vEnvironmentName="${i#*=}"
         ;;
 
-        -b=*|--environmentbrand=*)
+        --environmentbrand=*)
             vEnvironmentBrand="${i#*=}"
         ;;
 
-        -d=*|--environmentdescription=*)
+        --environmentdescription=*)
             vEnvironmentDescription="${i#*=}"
         ;;
 
-        -t=*|--environmenttype=*)
+        --environmenttype=*)
             vEnvironmentType="${i#*=}"
         ;;
 
-        -i=*|--environmentinstance=*)
+        --environmentinstance=*)
             vEnvironmentInstance="${i#*=}"
         ;;
 
-        -o=*|--environmentowner=*)
+        --environmentowner=*)
             vEnvironmentOwner="${i#*=}"
         ;;
 
-        -n=*|--servername=*)
+        --servername=*)
             vServerName="${i#*=}"
         ;;
 
-        -s=*|--servertype=*)
+        --servertype=*)
             vServerType="${i#*=}"
         ;;
 
-        -c=*|--serverinstance=*)
+        --serverinstance=*)
             vServerInstance="${i#*=}"
         ;;
 
-        -r=*|--gitrepository=*)
+        --gitrepository=*)
             vGitRepository="${i#*=}"
         ;;
 
-        -u=*|--gitusername=*)
+        --gitusername=*)
             vGitUsername="${i#*=}"
         ;;
 
-        -p=*|--gitpassword=*)
+        --gitpassword=*)
             vGitPassword="${i#*=}"
         ;;
 
-        -m=*|--puppetserver=*)
+        --puppetserver=*)
             vPuppetServer="${i#*=}"
         ;;
         
-        -g=*|--resourcegroup=*)
+        --resourcegroup=*)
             vResourceGroup="${i#*=}"
         ;;
         
-        -a=*|--storageaccountname=*)
+        --storageaccountname=*)
             vStorageAccountName="${i#*=}"
+        ;;
+
+        --primarydns=*)
+            vPrimaryDNS="${i#*=}"
+        ;;
+
+        --secondarydns=*)
+            vSecondaryDNS="${i#*=}"
         ;;
         
         *)
@@ -193,6 +201,8 @@ env_instance=${vEnvironmentInstance}
 env_owner=${vEnvironmentOwner}
 env_resourcegroup=${vResourceGroup}
 env_storageaccountname=${vStorageAccountName}
+env_primarydns=${vPrimaryDNS}
+env_secondarydns=${vSecondaryDNS}
 EOF
 
 # Configure Server Facts
