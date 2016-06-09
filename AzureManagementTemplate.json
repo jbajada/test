@@ -214,7 +214,7 @@
         },
         "v_TemplateCreator": "Jason Bajada",
         "v_StorageAccountName": "[concat(uniquestring(resourceGroup().id))]",
-        "v_PuppetScriptLocation": "https://raw.githubusercontent.com/jbajada/test/master/install_puppet2.sh",
+        "v_PuppetScriptLocation": "https://raw.githubusercontent.com/jbajada/test/master/install_puppet.sh",
         "v_AzureStartScript": "https://raw.githubusercontent.com/jbajada/test/master/hndg-startup-rb.graphrunbook",
         "v_AzureShutdownScript": "https://raw.githubusercontent.com/jbajada/test/master/hndg-shutdown-rb.graphrunbook",
         "v_ServerRoles": [
