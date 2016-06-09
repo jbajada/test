@@ -104,12 +104,14 @@
         },
         "env_startupUtcDateTime": {
             "type": "string",
+            "defaultValue": "06/10/2016 21:00",
             "metadata": {
                 "description": "The startup datetime, as a string in UTC time, for scheduler purposes; example in parameters file is in MM/dd/yyyy H:mm:ss tt format"
             }
         },
         "env_shutdownUtcDateTime": {
             "type": "string",
+            "defaultValue": "06/10/2016 07:00",
             "metadata": {
                 "description": "The shutdown datetime, as a string in UTC time, for scheduler purposes; example in parameters file is in MM/dd/yyyy H:mm:ss tt format"
             }
