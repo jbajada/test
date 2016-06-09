@@ -120,37 +120,6 @@ case $OS in
 esac
 
 ## Disable all existing Repos
-#for f in /etc/yum.repos.d/*.repo; do mv "$f" "$f.disabled"; done
-#yum clean all
-
-## Add PuppetLabs Products repo
-cat > /etc/yum.repos.d/hndg-puppetlabs.repo <<EOF
-[hndg-puppetlabs-products]
-name=Puppet Labs Products
-baseurl=http://puppetlabs-products.${DistroBasedOn}${MajorRev}.repo.dev.hndigital.net
-enabled=1
-gpgcheck=0
-
-[hndg-puppetlabs-deps]
-name=Puppet Labs Dependencies
-baseurl=http://puppetlabs-deps.${DistroBasedOn}${MajorRev}.repo.dev.hndigital.net
-enabled=1
-gpgcheck=0
-EOF
-
-## Add OS repo
-cat > /etc/yum.repos.d/hndg-${DistroBasedOn}-base.repo <<EOF
-[hndg-${DistroBasedOn}-base]
-name=${DistroBasedOn} Repository
-baseurl=http://${DistroBasedOn}-base.${DistroBasedOn}${MajorRev}.repo.dev.hndigital.net
-enabled=1
-gpgcheck=0
-EOF
-
-## Install Puppet
-yum install -y puppet
-
-## Disable all existing Repos
 for f in /etc/yum.repos.d/*.repo; do mv "$f" "$f.disabled"; done
 yum clean all
 
@@ -178,6 +147,8 @@ enabled=1
 gpgcheck=0
 EOF
 
+## Install Puppet
+yum install -y puppet
 
 ## Get unique ID of current server
 if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]; then
