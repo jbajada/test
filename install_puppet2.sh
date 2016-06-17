@@ -183,9 +183,11 @@ EOF
 if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]; then
   ## Running under AWS
   vInstance_id=$(wget -q -O - http://instance-data/latest/meta-data/instance-id)
+  vInfrastructure="aws"
 else
   ## Running under Azure  
   vInstance_id=$(dmidecode | grep UUID | awk '{ print $2}')
+  vInfrastructure="azure"
 fi
 
 ## Configure puppet to use the correct certificates
@@ -230,8 +232,8 @@ env_instance=${vEnvironmentInstance}
 env_owner=${vEnvironmentOwner}
 env_resourcegroup=${vResourceGroup}
 env_storageaccountname=${vStorageAccountName}
-env_primarydns=${vPrimaryDNS}
-env_secondarydns=${vSecondaryDNS}
+env_${vInfrastructure}_private_ns1_name=${vPrimaryDNS}
+env_${vInfrastructure}_private_ns2_name=${vSecondaryDNS}
 EOF
 
 # Configure Server Facts
@@ -242,7 +244,7 @@ srv_instance=${vServerInstance}
 EOF
 
 # Remove sensitive data from log files
-find /var/log/azure -type f -name '*.log' -exec sed -i -r 's:--gitpassword=\\*"([^"]*)\\*":--gitpassword="******":g' {} \;
+find /var/log/${vInfrastructure} -type f -name '*.log' -exec sed -i -r 's:--gitpassword=\\*"([^"]*)\\*":--gitpassword="******":g' {} \;
 
 # Setup Puppet cron and Run Puppet","\n",
 #### puppet resource cron puppet-agent ensure=present user=root minute=*/15 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
