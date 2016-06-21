@@ -148,7 +148,7 @@ gpgcheck=0
 EOF
 
 ## Install Puppet
-yum install -y puppet
+yum install -y puppet ntp
 
 ## Get unique ID of current server
 if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]; then

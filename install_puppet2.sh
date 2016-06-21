@@ -148,7 +148,7 @@ gpgcheck=0
 EOF
 
 ## Install Puppet
-yum install -y puppet
+yum install -y puppet ntp
 
 ## Disable all existing Repos
 for f in /etc/yum.repos.d/*.repo; do mv "$f" "$f.disabled"; done
