@@ -119,6 +119,9 @@ case $OS in
     ;;
 esac
 
+## Install Required Files
+yum install -y ntp
+
 ## Disable all existing Repos
 for f in /etc/yum.repos.d/*.repo; do mv "$f" "$f.disabled"; done
 yum clean all
@@ -148,7 +151,7 @@ gpgcheck=0
 EOF
 
 ## Install Puppet
-yum install -y puppet ntp
+yum install -y puppet
 
 ## Get unique ID of current server
 if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]; then
