@@ -252,4 +252,4 @@ find /var/log/${vInfrastructure} -type f -name '*.log' -exec sed -i -r 's:--gitp
 # Setup Puppet cron and Run Puppet","\n",
 puppet resource cron puppet-agent ensure=present user=root minute=*/15 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
 grep -q -F 'puppet agent --test' /etc/rc.local || echo 'puppet agent --test' >> /etc/rc.local
-puppet agent --test
+nohup puppet agent --test &
