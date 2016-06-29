@@ -119,13 +119,6 @@ case $OS in
     ;;
 esac
 
-## Install Required Files
-yum install -y ntp
-
-## Disable all existing Repos
-for f in /etc/yum.repos.d/*.repo; do mv "$f" "$f.disabled"; done
-yum clean all
-
 ## Add PuppetLabs Products repo
 cat > /etc/yum.repos.d/hndg-puppetlabs.repo <<EOF
 [hndg-puppetlabs-products]
@@ -150,6 +143,12 @@ enabled=1
 gpgcheck=0
 EOF
 
+## Perform a yum clean
+yum clean all
+
+## Install Required Packages
+yum install -y ntp
+
 ## Install Puppet
 yum install -y puppet
 
@@ -170,12 +169,6 @@ puppet cert list --all
 mkdir -p $ssldir/certs/
 mkdir -p $ssldir/public_keys/
 mkdir -p $ssldir/private_keys/
-## Permanent Certificate Solution
-##curl -u ${envGitUsername}:${envGitPassword} ${vGitRepository}/securitykeys/browse/puppet/certs/ca.pem?raw -o $ssldir/certs/ca.pem
-##curl -u ${envGitUsername}:${envGitPassword} ${vGitRepository}/securitykeys/browse/puppet/ca/signed/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/certs/${vEnvironmentType}.hndigital.net.pem
-##curl -u ${envGitUsername}:${envGitPassword} ${vGitRepository}/securitykeys/browse/puppet/public_keys/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${vEnvironmentType}.hndigital.net.pem
-##curl -u ${envGitUsername}:${envGitPassword} ${vGitRepository}/securitykeys/browse/puppet/private_keys/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${vEnvironmentType}.hndigital.net.pem
-## Temporary Certificate Solution
 curl ${vGitRepository}/ssl/certs/ca.pem -o $ssldir/certs/ca.pem
 curl ${vGitRepository}/ssl/certs/${vEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${vEnvironmentType}.hndigital.net.pem
 curl ${vGitRepository}/ssl/public_keys/${vEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${vEnvironmentType}.hndigital.net.pem
