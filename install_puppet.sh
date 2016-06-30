@@ -169,10 +169,10 @@ puppet cert list --all
 mkdir -p $ssldir/certs/
 mkdir -p $ssldir/public_keys/
 mkdir -p $ssldir/private_keys/
-curl -u ${vGitUsername}:${vGitPassword} ${vGitRepository}/ssl/certs/ca.pem -o $ssldir/certs/ca.pem
-curl -u ${vGitUsername}:${vGitPassword} ${vGitRepository}/ssl/certs/${vEnvironmentType}.hndigital.net.pem -o $ssldir/certs/${vEnvironmentType}.hndigital.net.pem
-curl -u ${vGitUsername}:${vGitPassword} ${vGitRepository}/ssl/public_keys/${vEnvironmentType}.hndigital.net.pem -o $ssldir/public_keys/${vEnvironmentType}.hndigital.net.pem
-curl -u ${vGitUsername}:${vGitPassword} ${vGitRepository}/ssl/private_keys/${vEnvironmentType}.hndigital.net.pem -o $ssldir/private_keys/${vEnvironmentType}.hndigital.net.pem
+curl -u ${vGitUsername}:${vGitPassword} ${vGitRepository}/ssl/certs/ca.pem?raw -o $ssldir/certs/ca.pem
+curl -u ${vGitUsername}:${vGitPassword} ${vGitRepository}/ssl/certs/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/certs/${vEnvironmentType}.hndigital.net.pem
+curl -u ${vGitUsername}:${vGitPassword} ${vGitRepository}/ssl/public_keys/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/public_keys/${vEnvironmentType}.hndigital.net.pem
+curl -u ${vGitUsername}:${vGitPassword} ${vGitRepository}/ssl/private_keys/${vEnvironmentType}.hndigital.net.pem?raw -o $ssldir/private_keys/${vEnvironmentType}.hndigital.net.pem
 find $ssldir/ -name '*.pem' | xargs chmod 600
 find $ssldir/ -name '*.pem' | xargs chown puppet:puppet
 
