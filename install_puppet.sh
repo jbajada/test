@@ -134,15 +134,6 @@ enabled=1
 gpgcheck=0
 EOF
 
-## Add OS repo
-cat > /etc/yum.repos.d/hndg-${DistroBasedOn}-base.repo <<EOF
-[hndg-${DistroBasedOn}-base]
-name=${DistroBasedOn} Repository
-baseurl=http://${DistroBasedOn}-base.${DistroBasedOn}${MajorRev}.repo.dev.hndigital.net
-enabled=1
-gpgcheck=0
-EOF
-
 ## Perform a yum clean
 yum clean all
 
