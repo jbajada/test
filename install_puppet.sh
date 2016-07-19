@@ -205,6 +205,6 @@ EOF
 find /var/log/${vInfrastructure} -type f -name '*.log' -exec sed -i -r 's:--gitpassword=\\*"([^"]*)\\*":--gitpassword="******":g' {} \;
 
 # Setup Puppet cron and Run Puppet","\n",
-puppet resource cron puppet-agent ensure=present user=root minute=*/15 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
-grep -q -F 'puppet agent --test' /etc/rc.local || echo 'puppet agent --test' >> /etc/rc.local
-nohup puppet agent --test &
+##puppet resource cron puppet-agent ensure=present user=root minute=*/15 command='/usr/bin/puppet agent --onetime --no-daemonize --splay'
+##grep -q -F 'puppet agent --test' /etc/rc.local || echo 'puppet agent --test' >> /etc/rc.local
+##nohup puppet agent --test &
