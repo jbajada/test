@@ -64,6 +64,10 @@ do
             vResourceGroup="${i#*=}"
         ;;
         
+        --puppetdbpassword=*)
+        	vPuppetDbPassword="${i#*=}"
+        ;;
+        
         --storageaccountname=*)
             vStorageAccountName="${i#*=}"
         ;;
@@ -125,9 +129,6 @@ else
   vInstance_id=$(dmidecode | grep UUID | awk '{ print $2}')
   vInfrastructure="azure"
 fi
-
-## Setup DNS Settings
-
 
 ## Install Required Packages
 yum install -y ntp
@@ -213,9 +214,6 @@ mkdir -p /etc/puppet
 mount -l puppet /etc/puppet
 mkdir -p /var/lib/puppet/reports
 
-## Install Required Packages
-yum install -y createrepo httpd git
-
 ## Add PuppetLabs Products repo
 cat > /etc/yum.repos.d/hndg-puppetlabs.repo <<EOF
 [hndg-puppetlabs-products]
@@ -230,6 +228,12 @@ baseurl=http://puppetlabs-deps.${DistroBasedOn}${MajorRev}.repo.dev.hndigital.ne
 enabled=1
 gpgcheck=0
 EOF
+
+## Setup DNS Settings
+sed -i 's/nameserver.*/nameserver ${vPrimaryDNS}\nnameserver ${vSecondaryDNS}/g' /etc/resolv.conf 
+
+## Install Required Packages
+yum install -y createrepo httpd git
 
 ## Download Repo Files
 git clone https://${vGitUsername}:${vGitPassword}@stash.harveynorman.com.au/scm/puppet/yumrepo.git /var/www/repo/hndigital
@@ -271,7 +275,7 @@ echo "" >> /var/lib/pgsql9/data/pg_hba.conf
 echo "local    all    all                    trust" >> /var/lib/pgsql9/data/pg_hba.conf
 echo "host     all    all    127.0.0.1/32    trust" >> /var/lib/pgsql9/data/pg_hba.conf
 /sbin/service postgresql start
-su - postgres -c "echo \"CREATE ROLE puppetdb WITH NOSUPERUSER NOCREATEDB NOCREATEROLE LOGIN PASSWORD '${PuppetDbPassword}';\" | psql -U postgres"
+su - postgres -c "echo \"CREATE ROLE puppetdb WITH NOSUPERUSER NOCREATEDB NOCREATEROLE LOGIN PASSWORD '${vPuppetDbPassword}';\" | psql -U postgres"
 su - postgres -c "createdb -O puppetdb puppetdb"
 
 ## Install Puppet
@@ -291,7 +295,7 @@ classname = org.postgresql.Driver
 subprotocol = postgresql
 subname = //127.0.0.1:5432/puppetdb
 username = puppetdb
-password = ${PuppetDbPassword}
+password = ${vPuppetDbPassword}
 log-slow-statements = 10
 EOF
 
