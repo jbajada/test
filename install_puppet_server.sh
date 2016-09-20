@@ -230,36 +230,15 @@ gpgcheck=0
 EOF
 
 ## Setup DNS Settings
-sed -i 's/nameserver.*/nameserver ${vPrimaryDNS}\nnameserver ${vSecondaryDNS}/g' /etc/resolv.conf 
+sed -i "s/nameserver.*/nameserver \${vPrimaryDNS}\nnameserver \${vSecondaryDNS}/g" /etc/resolv.conf 
 
 ## Install Required Packages
 yum install -y createrepo httpd git
 
 ## Download Repo Files
-git clone https://${vGitUsername}:${vGitPassword}@stash.harveynorman.com.au/scm/puppet/yumrepo.git /var/www/repo/hndigital
-git clone https://${vGitUsername}:${vGitPassword}@stash.harveynorman.com.au/scm/puppet/yumrepo-puppet.git /var/www/repo/puppet
-
-## Configure Repos
-sed -i "s/Listen 80/Listen 80\nListen 8181/g" /etc/httpd/conf/httpd.conf
-cat > /etc/httpd/conf.d/reposerver.conf
-NameVirtualHost *:80
-
-<VirtualHost *:80>
-    ServerName reposerver.au.hndigital.net
-    ServerAlias *.repo.dev.hndigital.net
-    ServerAlias *.repo.au.hndigital.net
-    VirtualDocumentRoot /var/www/repo/%2/%1
-    ErrorLog logs/reposerver-error_log
-    CustomLog logs/reposerver-access_log common
-    <Directory /var/www/repo/%2/%1>
-        AllowOverride None
-        Options +Indexes
-    </Directory>   
-</VirtualHost>
-EOF
-
-## Refresh Repos
-createrepo -v /var/www/repo && /sbin/service httpd restart
+curl -u ${vGitUsername}:${vGitPassword} https://stash.harveynorman.com.au/projects/AZURE/repos/package-repo/browse/repo-setup.sh?raw -o /tmp/repo-setup.sh
+chmod +x /tmp/repo-setup.sh
+/tmp/repo-setup.sh
 
 ## Perform a yum clean
 yum clean all
