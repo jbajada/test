@@ -202,7 +202,7 @@ do
     if [ ${?} -ne 0 ];
     then   
         ## Creating filesystem
-        LABEL=$(fdisk -l /dev/sdc1 |grep "Disk /dev/sdc1:" | head -n 2 | tail -n 1 | cut -d " " -f 5 | awk '{if (($1/1000000000) > 200) print "repo"; else print "puppet" }')
+        LABEL=$(fdisk -l ${PARTITION} |grep "Disk ${PARTITION}:" | head -n 2 | tail -n 1 | cut -d " " -f 5 | awk '{if (($1/1000000000) > 200) print "repo"; else print "puppet" }')
         mkfs -j -t xfs -L ${LABEL} ${PARTITION}
     fi
 done
