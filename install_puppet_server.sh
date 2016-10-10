@@ -131,7 +131,7 @@ else
 fi
 
 ## Install Required Packages
-yum install -y ntp
+yum install -y ntp xfsprogs
 
 ## Function: Scan for New Data Disks
 scan_for_new_disks() {
