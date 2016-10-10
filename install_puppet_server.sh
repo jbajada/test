@@ -268,7 +268,7 @@ yum install -y rubygems
 gem install hiera-eyaml
 
 ## Setup PuppetDB
-cat > /etc/puppetdb/conf.d/database.ini
+cat > /etc/puppetdb/conf.d/database.ini <<EOF
 [database]
 classname = org.postgresql.Driver
 subprotocol = postgresql
